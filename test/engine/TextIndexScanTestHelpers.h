@@ -5,12 +5,14 @@
 #ifndef QLEVER_TEST_ENGINE_TEXTINDEXSCANTESTHELPERS_H
 #define QLEVER_TEST_ENGINE_TEXTINDEXSCANTESTHELPERS_H
 
+#include "../util/GTestHelpers.h"
 #include "engine/QueryExecutionContext.h"
 #include "engine/Result.h"
 #include "global/Id.h"
 #include "global/IndexTypes.h"
 
 namespace textIndexScanTestHelpers {
+
 constexpr std::string_view inlineSeparator = "\t";
 constexpr std::string_view lineSeparator = "\n";
 
@@ -122,26 +124,29 @@ struct TextResult {
   bool scoreIsInt_ = true;
 
   auto getRow(size_t row) const {
-    return h::combineToString(
-        h::getTextRecordFromResultTable(qec_, result_, row),
-        h::getWordFromResultTable(qec_, result_, row));
+    return combineToString(getTextRecordFromResultTable(qec_, result_, row),
+                           getWordFromResultTable(qec_, result_, row));
   }
 
   auto getId(size_t row) const {
-    return h::getTextRecordIdFromResultTable(qec_, result_, row);
+    return getTextRecordIdFromResultTable(qec_, result_, row);
+  }
+
+  auto getEntity(size_t row) const {
+    return getEntityFromResultTable(qec_, result_, row);
   }
 
   auto getTextRecord(size_t row) const {
-    return h::getTextRecordFromResultTable(qec_, result_, row);
+    return getTextRecordFromResultTable(qec_, result_, row);
   }
 
   auto getWord(size_t row) const {
-    return h::getWordFromResultTable(qec_, result_, row);
+    return getWordFromResultTable(qec_, result_, row);
   }
 
   auto getScore(size_t row) const {
-    return h::getScoreFromResultTable(qec_, result_, row, isPrefixSearch_,
-                                      scoreIsInt_);
+    return getScoreFromResultTable(qec_, result_, row, isPrefixSearch_,
+                                   scoreIsInt_);
   }
 
   // Collect all words of rows [start, end) and compare them in unordered

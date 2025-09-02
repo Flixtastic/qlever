@@ -66,25 +66,19 @@ TEST(TextIndexScan, TestTextBlockSizes) {
     auto tr3 = h::TextResult{qec, result3, true};
     ASSERT_EQ(result3.idTable().numColumns(), 3);
     ASSERT_EQ(result3.idTable().size(), 10);
-    ASSERT_EQ(h::combineToString("\"he failed the test\"", "failed"),
-              tr3.getRow(0));
-    ASSERT_EQ(h::combineToString("\"he failed the test\"", "he"),
-              tr3.getRow(1));
-    ASSERT_EQ(h::combineToString("\"he failed the test\"", "test"),
-              tr3.getRow(2));
-    ASSERT_EQ(h::combineToString("\"he failed the test\"", "the"),
-              tr3.getRow(3));
-    ASSERT_EQ(h::combineToString("\"some other sentence\"", "other"),
-              tr3.getRow(4));
-    ASSERT_EQ(h::combineToString("\"some other sentence\"", "sentence"),
-              tr3.getRow(5));
-    ASSERT_EQ(h::combineToString("\"some other sentence\"", "some"),
-              tr3.getRow(6));
-    ASSERT_EQ(h::combineToString("\"testing can help\"", "can"), tr3.getRow(7));
-    ASSERT_EQ(h::combineToString("\"testing can help\"", "help"),
-              tr3.getRow(8));
-    ASSERT_EQ(h::combineToString("\"testing can help\"", "testing"),
-              tr3.getRow(9));
+    tr3.checkUnorderedListOfWordsInRange({"he", "failed", "the", "test"}, 0, 4);
+    tr3.checkUnorderedListOfWordsInRange({"some", "other", "sentence"}, 4, 7);
+    tr3.checkUnorderedListOfWordsInRange({"testing", "can", "help"}, 7, 10);
+    ASSERT_EQ("\"he failed the test\"", tr3.getTextRecord(0));
+    ASSERT_EQ("\"he failed the test\"", tr3.getTextRecord(1));
+    ASSERT_EQ("\"he failed the test\"", tr3.getTextRecord(2));
+    ASSERT_EQ("\"he failed the test\"", tr3.getTextRecord(3));
+    ASSERT_EQ("\"some other sentence\"", tr3.getTextRecord(4));
+    ASSERT_EQ("\"some other sentence\"", tr3.getTextRecord(5));
+    ASSERT_EQ("\"some other sentence\"", tr3.getTextRecord(6));
+    ASSERT_EQ("\"testing can help\"", tr3.getTextRecord(7));
+    ASSERT_EQ("\"testing can help\"", tr3.getTextRecord(8));
+    ASSERT_EQ("\"testing can help\"", tr3.getTextRecord(9));
   }
 }
 
