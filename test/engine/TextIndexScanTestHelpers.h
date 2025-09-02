@@ -122,37 +122,55 @@ struct TextResult {
   bool scoreIsInt_ = true;
 
   auto getRow(size_t row) const {
-    return combineToString(getTextRecordFromResultTable(qec_, result_, row),
-                           getWordFromResultTable(qec_, result_, row));
+    return h::combineToString(
+        h::getTextRecordFromResultTable(qec_, result_, row),
+        h::getWordFromResultTable(qec_, result_, row));
   }
 
   auto getId(size_t row) const {
-    return getTextRecordIdFromResultTable(qec_, result_, row);
-  }
-
-  auto getEntity(size_t row) const {
-    return getEntityFromResultTable(qec_, result_, row);
+    return h::getTextRecordIdFromResultTable(qec_, result_, row);
   }
 
   auto getTextRecord(size_t row) const {
-    return getTextRecordFromResultTable(qec_, result_, row);
+    return h::getTextRecordFromResultTable(qec_, result_, row);
   }
 
   auto getWord(size_t row) const {
-    return getWordFromResultTable(qec_, result_, row);
+    return h::getWordFromResultTable(qec_, result_, row);
   }
 
   auto getScore(size_t row) const {
-    return getScoreFromResultTable(qec_, result_, row, isPrefixSearch_,
-                                   scoreIsInt_);
+    return h::getScoreFromResultTable(qec_, result_, row, isPrefixSearch_,
+                                      scoreIsInt_);
   }
 
-  void checkListOfWords(const std::vector<std::string>& expectedWords,
-                        size_t& startingIndex) const {
-    for (const auto& word : expectedWords) {
-      ASSERT_EQ(word, getWord(startingIndex));
-      ++startingIndex;
+  // Collect all words of rows [start, end) and compare them in unordered
+  // fashion to expectedWords.
+  // This function is necessary since the results of a TextIndexScanForWord is
+  // only sorted by `TextRecordIndex`. This leads to the words not being in
+  // order and an unpredictability in which row they appear in.
+  void checkUnorderedListOfWordsInRange(
+      const std::vector<std::string>& expectedWords, size_t start,
+      size_t end) const {
+    std::vector<std::string> wordsInTable;
+    wordsInTable.reserve(end - start);
+    for (; start < end; ++start) {
+      wordsInTable.emplace_back(getWord(start));
     }
+    ASSERT_THAT(wordsInTable,
+                ::testing::UnorderedElementsAreArray(expectedWords));
+  }
+
+  void checkUnorderedListOfScoresInRange(
+      const std::vector<Score>& expectedScores, size_t start,
+      size_t end) const {
+    std::vector<Score> scoresInTable;
+    scoresInTable.reserve(end - start);
+    for (; start < end; ++start) {
+      scoresInTable.emplace_back(getScore(start));
+    }
+    ASSERT_THAT(scoresInTable,
+                ::testing::UnorderedElementsAreArray(expectedScores));
   }
 };
 }  // namespace textIndexScanTestHelpers
